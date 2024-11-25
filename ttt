@@ -1,0 +1,403 @@
+// ai
+#include <iostream>
+#include <limits>
+
+using namespace std;
+
+char board[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+char player = 'X', ai = 'O';
+
+void display() {
+    for (int i=0; i<9; i++) {
+        if (i==0) cout << "\n|";
+        if (i==3 || i==6) cout << "\n-------------\n|";
+        cout << " " << board[i] << " |";
+    }
+}
+
+bool isBoardFull() {
+    for (char c : board) {
+        if (c == ' ') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool hasWon(char currentPlayer) {
+    return (board[0] == currentPlayer && board[1] == currentPlayer && board[2] == currentPlayer) ||     // row
+           (board[3] == currentPlayer && board[4] == currentPlayer && board[5] == currentPlayer) ||     // row
+           (board[6] == currentPlayer && board[7] == currentPlayer && board[8] == currentPlayer) ||     // row
+           (board[0] == currentPlayer && board[3] == currentPlayer && board[6] == currentPlayer) ||     // col
+           (board[1] == currentPlayer && board[4] == currentPlayer && board[7] == currentPlayer) ||     // col
+           (board[2] == currentPlayer && board[5] == currentPlayer && board[8] == currentPlayer) ||     // col
+           (board[0] == currentPlayer && board[4] == currentPlayer && board[8] == currentPlayer) ||     // diag
+           (board[2] == currentPlayer && board[4] == currentPlayer && board[6] == currentPlayer);       // diag
+}
+
+bool isGameOver() {
+    cout << endl << endl;
+    if (hasWon(player)) {
+        cout << "Player wins!" << endl;
+        return true;
+    }
+    if (hasWon(ai)) {
+        cout << "AI wins!" << endl;
+        return true;
+    }
+    if (isBoardFull()) {
+        cout << "It's a tie!" << endl;
+        return true;
+    }
+    return false;
+}
+
+int minimax(bool isMaximizing) {
+    if (hasWon(ai)) return 1;
+    if (hasWon(player)) return -1;
+    if (isBoardFull()) return 0;
+
+    int bestScore = isMaximizing ? INT_MIN : INT_MAX;
+
+    for (int i = 0; i < 9; i++) {
+        if (board[i] == ' ') {
+            board[i] = isMaximizing ? ai : player;
+            int score = minimax(!isMaximizing);
+            board[i] = ' ';
+            bestScore = isMaximizing ? max(score, bestScore) : min(score, bestScore);
+        }
+    }
+    return bestScore;
+}
+
+void aiMove() {
+    int bestScore = INT_MIN;
+    int move = -1;
+
+    for (int i = 0; i < 9; i++) {
+        if (board[i] == ' ') {
+            board[i] = ai;
+            int score = minimax(false);
+            board[i] = ' ';
+            if (score > bestScore) {
+                bestScore = score;
+                move = i;
+            }
+        }
+    }
+    board[move] = ai;
+    cout << "\n\nAI chose position " << (move + 1) << endl;
+    display();
+}
+
+void playerMove() {
+    int move;
+    while (true) {
+        cout << "\nEnter your move (1-9): ";
+        cin >> move;
+        move -= 1;
+        if (move >= 0 && move < 9 && board[move] == ' ') {
+            board[move] = player;
+            break;
+        }
+        cout << "Invalid move, try again." << endl;
+    }
+    display();
+}
+
+int main() {
+    cout << "\nTic Tac Toe - Player vs. Computer\n";
+    cout << "---------------------------------\n";
+
+    display();
+
+    while (true) {
+        // aiMove();
+        // if (isGameOver()) break;
+
+        // playerMove();
+        // if (isGameOver()) break;
+
+        playerMove();
+        if (isGameOver()) break;
+
+        aiMove();
+        if (isGameOver()) break;
+    }
+
+    return 0;
+}
+
+// non ai (pvp1)
+#include <iostream>
+
+using namespace std;
+
+char board[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+char currentPlayer = 'X';
+
+void display() {
+    for (int i = 0; i < 9; i++) {
+        if (i == 0) cout << "\n|";
+        if (i == 3 || i == 6) cout << "\n-------------\n|";
+        cout << " " << board[i] << " |";
+    }
+}
+
+bool isBoardFull() {
+    for (char c : board) {
+        if (c == ' ') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool hasWon(char currentPlayer) {
+    return (board[0] == currentPlayer && board[1] == currentPlayer && board[2] == currentPlayer) ||     // row
+           (board[3] == currentPlayer && board[4] == currentPlayer && board[5] == currentPlayer) ||     // row
+           (board[6] == currentPlayer && board[7] == currentPlayer && board[8] == currentPlayer) ||     // row
+           (board[0] == currentPlayer && board[3] == currentPlayer && board[6] == currentPlayer) ||     // col
+           (board[1] == currentPlayer && board[4] == currentPlayer && board[7] == currentPlayer) ||     // col
+           (board[2] == currentPlayer && board[5] == currentPlayer && board[8] == currentPlayer) ||     // col
+           (board[0] == currentPlayer && board[4] == currentPlayer && board[8] == currentPlayer) ||     // diag
+           (board[2] == currentPlayer && board[4] == currentPlayer && board[6] == currentPlayer);       // diag
+}
+
+bool isGameOver() {
+    cout << endl << endl;
+    if (hasWon('X')) {
+        cout << "Player X wins!" << endl;
+        return true;
+    }
+    if (hasWon('O')) {
+        cout << "Player O wins!" << endl;
+        return true;
+    }
+    if (isBoardFull()) {
+        cout << "It's a tie!" << endl;
+        return true;
+    }
+    return false;
+}
+
+void playerMove() {
+    int move;
+    while (true) {
+        cout << "\nPlayer " << currentPlayer << ", enter your move (1-9): ";
+        cin >> move;
+        move -= 1;
+        if (move >= 0 && move < 9 && board[move] == ' ') {
+            board[move] = currentPlayer;
+            break;
+        }
+        cout << "Invalid move, try again." << endl;
+    }
+    display();
+}
+
+int main() {
+    cout << "\nTic Tac Toe - Player vs. Player\n";
+    cout << "---------------------------------\n";
+
+    display();
+
+    while (true) {
+        playerMove();
+        if (isGameOver()) break;
+
+        // Switch players
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
+    return 0;
+}
+
+
+
+// non ai (pvp2)
+#include <iostream>
+using namespace std;
+
+char p1 = 'X';
+char p2 = 'O';
+
+bool check(char board[], char p) {
+    // diagonal
+    if(    (board[0] == p && board[4] == p && board[8] == p) 
+        || (board[2] == p && board[4] == p && board[6] == p) )
+        return true;
+
+    // rows
+    else if(   (board[0] == p && board[1] == p && board[2] == p) 
+            || (board[3] == p && board[4] == p && board[5] == p)  
+            || (board[6] == p && board[7] == p && board[8] == p) )
+        return true;
+
+    // columns
+    else if(   (board[0] == p && board[3] == p && board[6] == p) 
+            || (board[1] == p && board[4] == p && board[7] == p)  
+            || (board[2] == p && board[5] == p && board[8] == p) )
+        return true;
+    return false;
+}
+
+void display(char board[]){
+    for (int i=0; i<9; i++) {
+        if (i == 0) cout << "\n|";
+        if (i == 3) cout << "\n-------------\n|";
+        if (i == 6) cout << "\n-------------\n|";
+        cout << " " << board[i] << " |";
+    }
+}
+
+int main() {
+    char board[9];
+    for (int i = 0; i < 9; i++) {
+        board[i] = ' ';
+    }
+    
+    
+    for (int i=1; i<10; i++) {
+        int place;
+
+        if (i % 2 != 0) {
+            label1:
+            cout << "\n\nPlayer 1: ";
+            cout << "Enter your move: ";
+            cin >> place;
+            if (board[place] == p1 || board[place] == p2) {
+                cout << "\nAlready used :(\n";
+                goto label1;
+            }
+            board[place] = p1;
+            display(board);
+            if (check(board, p1)) {
+                cout << "\n\tPlayer 1 wins!";
+                break;
+            }
+        }
+        else {
+            label2:
+            cout << "\n\nPlayer 2: ";
+            cout << "Enter your move: ";
+            cin >> place;
+            if(board[place] == p1 || board[place] == p2){
+                cout << "\nAlready used :(";
+                goto label2;
+            }
+            board[place] = p2;
+            display(board);
+            if (check(board, p2)) {
+                cout << "\n\tPlayer 2 wins!";
+                break;
+            }
+        }
+        if (i == 9)
+            cout << "\n\t\nGAME DRAW!";
+    }
+    return 0;
+}
+
+
+// non ai (player vs comp(random))
+#include <iostream>
+#include <cstdlib> // For rand() and srand()
+#include <ctime>   // For time()
+
+using namespace std;
+
+char board[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+char player = 'X', ai = 'O';
+
+void display() {
+    for (int i = 0; i < 9; i++) {
+        if (i == 0) cout << "\n|";
+        if (i == 3 || i == 6) cout << "\n-------------\n|";
+        cout << " " << board[i] << " |";
+    }
+}
+
+bool isBoardFull() {
+    for (char c : board) {
+        if (c == ' ') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool hasWon(char currentPlayer) {
+    return (board[0] == currentPlayer && board[1] == currentPlayer && board[2] == currentPlayer) ||     // row
+           (board[3] == currentPlayer && board[4] == currentPlayer && board[5] == currentPlayer) ||     // row
+           (board[6] == currentPlayer && board[7] == currentPlayer && board[8] == currentPlayer) ||     // row
+           (board[0] == currentPlayer && board[3] == currentPlayer && board[6] == currentPlayer) ||     // col
+           (board[1] == currentPlayer && board[4] == currentPlayer && board[7] == currentPlayer) ||     // col
+           (board[2] == currentPlayer && board[5] == currentPlayer && board[8] == currentPlayer) ||     // col
+           (board[0] == currentPlayer && board[4] == currentPlayer && board[8] == currentPlayer) ||     // diag
+           (board[2] == currentPlayer && board[4] == currentPlayer && board[6] == currentPlayer);       // diag
+}
+
+bool isGameOver() {
+    cout << endl << endl;
+    if (hasWon(player)) {
+        cout << "Player wins!" << endl;
+        return true;
+    }
+    if (hasWon(ai)) {
+        cout << "AI wins!" << endl;
+        return true;
+    }
+    if (isBoardFull()) {
+        cout << "It's a tie!" << endl;
+        return true;
+    }
+    return false;
+}
+
+void aiMove() {
+    srand(time(0)); // Seed the random number generator
+
+    int move;
+    while (true) {
+        move = rand() % 9; // Random move between 0 and 8
+        if (board[move] == ' ') {
+            board[move] = ai;
+            cout << "\n\nAI chose position " << (move + 1) << endl;
+            break;
+        }
+    }
+    display();
+}
+
+void playerMove() {
+    int move;
+    while (true) {
+        cout << "\nEnter your move (1-9): ";
+        cin >> move;
+        move -= 1;
+        if (move >= 0 && move < 9 && board[move] == ' ') {
+            board[move] = player;
+            break;
+        }
+        cout << "Invalid move, try again." << endl;
+    }
+    display();
+}
+
+int main() {
+    cout << "\nTic Tac Toe - Player vs. Computer\n";
+    cout << "---------------------------------\n";
+
+    display();
+
+    while (true) {
+        playerMove();
+        if (isGameOver()) break;
+
+        aiMove();
+        if (isGameOver()) break;
+    }
+
+    return 0;
+}
